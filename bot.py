@@ -1,5 +1,5 @@
 import asyncio
-import logging
+from loguru import logger
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -7,12 +7,12 @@ from aiogram.contrib.fsm_storage.redis import RedisStorage
 
 from tgbot.config import load_config
 from tgbot.filters.admin import AdminFilter
-from tgbot.handlers.admin import register_admin
-from tgbot.handlers.echo import register_echo
-from tgbot.handlers.user import register_user
+from tgbot.handlers.start import register
 from tgbot.middlewares.db import DbMiddleware
+from tgbot.filters.filter_log import setup_logger
+from tgbot.services.database import create_db_session
 
-logger = logging.getLogger(__name__)
+setup_logger(ignored=["aiogram.bot.api"])
 
 
 def register_all_middlewares(dp):
@@ -24,19 +24,11 @@ def register_all_filters(dp):
 
 
 def register_all_handlers(dp):
-    register_admin(dp)
-    register_user(dp)
-
-    register_echo(dp)
+    register(dp)
 
 
 async def main():
-    logging.basicConfig(
-        level=logging.INFO,
-        format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s',
-
-    )
-    logger.info("Starting bot")
+    logger.info("Bot started!")
     config = load_config(".env")
 
     if config.tg_bot.use_redis:
@@ -48,12 +40,12 @@ async def main():
     dp = Dispatcher(bot, storage=storage)
 
     bot['config'] = config
+    bot['db'] = await create_db_session(config)
 
     register_all_middlewares(dp)
     register_all_filters(dp)
     register_all_handlers(dp)
 
-    # start
     try:
         await dp.start_polling()
     finally:
