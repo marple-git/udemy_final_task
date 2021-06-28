@@ -4,7 +4,7 @@ import time
 
 
 async def start(m: Message):
-    await m.answer('Привет, товарищ ' + m.from_user.first_name)
+    await m.answer('Привет, товарищ!')
 
 
 def register(dp: Dispatcher):
