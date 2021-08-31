@@ -1,67 +1,46 @@
-import asyncio
-from sqlalchemy import Column, BigInteger, insert, String, update
-from sqlalchemy import select
+from typing import Optional, List
+
+from sqlalchemy import Column, BigInteger, insert, String, update, Boolean, Integer, select, ForeignKey
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
-from tgbot.config import load_config
-from tgbot.services.database import create_db_session
 from tgbot.services.db_base import Base
 
 
 class User(Base):
     __tablename__ = "users"
-    telegram_id = Column(BigInteger, primary_key=True)
-    first_name = Column(String(length=100))
-    last_name = Column(String(length=100), nullable=True)
-    username = Column(String(length=100), nullable=True)
-    lang_code = Column(String(length=4), default='ru_RU')
-    role = Column(String(length=100), default='user')
+    chat_id = Column(BigInteger, primary_key=True)
+    admin = Column(Boolean, default=False)
+    allowed = Column(Boolean, default=False)
+    balance = Column(Integer, default=0)
 
     @classmethod
-    async def get_user(cls, db_session: sessionmaker, telegram_id: int) -> 'User':
-        async with db_session() as db_session:
-            sql = select(cls).where(cls.telegram_id == telegram_id)
-            request = await db_session.execute(sql)
-            user: cls = request.scalar()
+    async def get_user(cls, session: AsyncSession, chat_id: int) -> 'User':
+        async with session.begin():
+            sql = select(cls).where(cls.chat_id == chat_id)
+            request = await session.execute(sql)
+            user: User = request.scalar()
         return user
 
     @classmethod
-    async def add_user(cls,
-                       db_session: sessionmaker,
-                       telegram_id: int,
-                       first_name: str,
-                       last_name: str = None,
-                       username: str = None,
-                       lang_code: str = None,
-                       role: str = None
-                       ) -> 'User':
-        async with db_session() as db_session:
-            sql = insert(cls).values(telegram_id=telegram_id,
-                                     first_name=first_name,
-                                     last_name=last_name,
-                                     username=username,
-                                     lang_code=lang_code,
-                                     role=role).returning('*')
-            result = await db_session.execute(sql)
-            await db_session.commit()
+    async def add_user(cls, session: AsyncSession, chat_id: int) -> 'User':
+        async with session.begin():
+            sql = insert(cls).values(chat_id=chat_id).returning('*')
+            result = await session.execute(sql)
             return result.first()
 
-    async def update_user(self, db_session: sessionmaker, updated_fields: dict) -> 'User':
-        async with db_session() as db_session:
-            sql = update(User).where(User.telegram_id == self.telegram_id).values(**updated_fields)
-            result = await db_session.execute(sql)
-            await db_session.commit()
+    @classmethod
+    async def get_all_users(cls, session: AsyncSession) -> List['User']:
+        async with session.begin():
+            stmt = select(User.chat_id)
+            result = await session.execute(stmt)
+            return result.scalars().all()
+
+    async def update_user(self, session: AsyncSession, updated_fields: dict, chat_id: Optional = None) -> 'User':
+        chat_id = self.chat_id if not chat_id else chat_id
+        async with session.begin():
+            sql = update(User).where(User.chat_id == chat_id).values(**updated_fields)
+            result = await session.execute(sql)
             return result
 
     def __repr__(self):
-        return f'User (ID: {self.telegram_id} - {self.first_name} {self.last_name})'
-
-
-if __name__ == '__main__':
-    import sqlalchemy.exc
-
-
-    async def test():
-        config = load_config()
-        session = await create_db_session(config)
-
-    asyncio.run(test())
+        return f'User (ID: {self.chat_id} - {self.admin} - {self.allowed})'

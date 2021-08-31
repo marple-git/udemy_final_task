@@ -1,6 +1,17 @@
 from dataclasses import dataclass
+from typing import List
 
 from environs import Env
+
+
+CHANNELS = [
+    -1001519662928
+]
+
+
+INVITE_CODES = [
+    'LATAND'
+]
 
 
 @dataclass
@@ -14,7 +25,7 @@ class DbConfig:
 @dataclass
 class TgBot:
     token: str
-    admin_ids: list[int]
+    admin_ids: List[int]
     use_redis: bool
 
 
