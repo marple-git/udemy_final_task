@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Union, List
 
-from sqlalchemy import Column, insert, String, Integer, Numeric, select
+from sqlalchemy import Column, insert, String, Integer, Numeric, select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tgbot.services.db_base import Base
@@ -27,9 +27,12 @@ async def add_item(name: str, description: str, photo: str, price: Union[int, De
     return item
 
 
-async def get_items(session: AsyncSession, name: str) -> List[Item]:
+async def get_items(session: AsyncSession, name: str = None) -> List[Item]:
     async with session.begin():
-        stmt = select(Item).where(Item.name.ilike(f'%{name}%'))
+        if name:
+            stmt = select(Item).where(Item.name.ilike(f'%{name}%'))
+        else:
+            stmt = select(Item).order_by(desc(Item.name))
         result = await session.execute(stmt)
     return result.scalars().all()
 

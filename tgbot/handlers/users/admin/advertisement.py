@@ -10,7 +10,7 @@ from tgbot.models.users import User
 
 
 async def enter_message(c: CallbackQuery, state: FSMContext):
-    await c.message.edit_text('✏️ Отправьте сообщение для рассылки', reply_markup=go_to_admin())
+    await c.message.answer('✏️ Отправьте сообщение для рассылки', reply_markup=go_to_admin())
     await Advertisement.message.set()
     async with state.proxy() as data:
         data['msg'] = c.message.message_id

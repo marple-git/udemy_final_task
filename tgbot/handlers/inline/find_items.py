@@ -16,13 +16,13 @@ async def empty_query(query: InlineQuery, state: FSMContext, user: User):
                      cache_time=5)
 
     print(query.query)
-    items = await get_items(session=query.bot['db'](), name=query.query)
+    items = await get_items(session=query.bot['db'](), name=query.query or None)
     bot_username = (await query.bot.get_me()).username
     bot_link = 'https://t.me/{bot_username}?start=i{item_id}'
     articles = [InlineQueryResultArticle(
         id=str(item.id),
         title=item.name,
-        description=f'Цена: ${item.price}',
+        description=f'Цена: {item.price} руб',
         input_message_content=InputTextMessageContent(
             message_text=item.name,
             parse_mode='HTML'

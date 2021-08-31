@@ -14,3 +14,9 @@ class AddItem(StatesGroup):
 
 class Advertisement(StatesGroup):
     message = State()
+
+
+class BuyItem(StatesGroup):
+    amount = State()
+    shipping_address = State()
+    payment = State()

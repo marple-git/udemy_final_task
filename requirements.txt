@@ -6,3 +6,4 @@ SQLAlchemy~=1.4.19
 asyncpg
 aiohttp~=3.7.4
 aiogram_broadcaster
+glQiwiApi

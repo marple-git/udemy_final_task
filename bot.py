@@ -12,6 +12,7 @@ from tgbot.handlers.users.admin.add_item import register_add_item
 from tgbot.handlers.users.admin.admin_panel import register_admin_panel
 from tgbot.handlers.users.admin.advertisement import register_advertisement
 from tgbot.handlers.users.authorize import register_authorize
+from tgbot.handlers.users.buy_item import register_buy_item
 from tgbot.handlers.users.start import register_start
 from tgbot.middlewares.db import DbMiddleware
 from tgbot.services.database import create_db_session
@@ -37,6 +38,7 @@ def register_all_handlers(dp):
     register_profile(dp)
     register_add_item(dp)
     register_find_items(dp)
+    register_buy_item(dp)
     register_advertisement(dp)
 
 

@@ -37,7 +37,7 @@ async def start_with_ref_link(m: Message, user: User):
         return await m.reply('❗️ К сожалению, данная ссылка недействительна.')
     await user.update_user(session=m.bot['db'](), updated_fields={'allowed': True})
     await user.update_user(session=m.bot['db'](), updated_fields={'balance': referrer.balance + 10}, chat_id=referrer.chat_id)
-    await m.bot.send_message(referrer.chat_id, f'🙈 Вы получили $10 за то, что пригласили пользователя {m.from_user.get_mention()}')
+    await m.bot.send_message(referrer.chat_id, f'🙈 Вы получили 10 руб. за то, что пригласили пользователя {m.from_user.get_mention()}')
     return await m.reply('🥰 Поздравляю, вы получили доступ! Введите /start')
 
 

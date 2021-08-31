@@ -8,7 +8,7 @@ from tgbot.models.users import User
 async def show_profile(c: CallbackQuery, user: User):
     return await c.message.edit_text(f'<b>👨🏼‍💻 Рады видеть тебя, {c.from_user.first_name}!</b>\n\n'
                                      f'<b>🔅 Telegram ID:</b> {c.from_user.id}\n'
-                                     f'<b>🔅 Баланс:</b> ${user.balance}',
+                                     f'<b>🔅 Баланс:</b> {user.balance} руб.',
                                      reply_markup=profile_keyboard())
 
 
