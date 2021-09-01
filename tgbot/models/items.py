@@ -32,7 +32,7 @@ async def get_items(session: AsyncSession, name: str = None) -> List[Item]:
         if name:
             stmt = select(Item).where(Item.name.ilike(f'%{name}%'))
         else:
-            stmt = select(Item).order_by(desc(Item.name))
+            stmt = select(Item).order_by(Item.name)
         result = await session.execute(stmt)
     return result.scalars().all()
 
