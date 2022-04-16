@@ -10,7 +10,7 @@ CHANNELS = [
 
 
 INVITE_CODES = [
-    'LATAND'
+    'ABOBA'
 ]
 
 
